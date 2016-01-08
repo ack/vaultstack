@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+sleep 4
+
+(/bin/start.consul -client 127.0.0.1 -config-file=/config/agent.json)&
+
+sleep 4
+
+vault server -config=/config/vault.hcl

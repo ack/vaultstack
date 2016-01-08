@@ -1,0 +1,88 @@
+---
+
+# USAGE:
+# - bring everything up with `docker-compose --x-networking --x-network-driver=overlay -d up`
+# - monitor logs, consul cluster should eventually sync, then if necessary restart vault instances
+# - `VAULT_ADDR=http://accessible-ip:8200 vault init | tee /tmp/vault.keys`
+# - `VAULT_ADDR=http://accessible-ip:8200 vault $key1` etc
+# WARN: re-baking a consul cluster may require a `for host in a b c ; do docker-machine ssh $host "rm -rf /var/consul" ; done`
+
+consul0:
+  container_name: consul0
+  hostname: consul0
+  image: acker/consul
+  net: ${COMPOSE_PROJECT_NAME}
+  restart: always
+  volumes:
+    - "/var/consul:/data"
+  environment:
+    - "constraint:node==ucp0"
+    - "CONSUL_SERVERS=consul0,consul1,consul2"
+  #ports:
+  #  - "8500:8500"
+  command: -server -bootstrap-expect=3 -log-level=${CONSUL_LOG} -config-file=/config/server.json -ui-dir=/ui
+
+consul1:
+  container_name: consul1
+  hostname: consul1
+  image: acker/consul
+  net: ${COMPOSE_PROJECT_NAME}
+  restart: always
+  volumes:
+    - "/var/consul:/data"
+  environment:
+    - "constraint:node==ucp1"
+    - "CONSUL_SERVERS=consul0,consul1,consul2"
+  #ports:
+  #  - "8500:8500"
+  command: -server -bootstrap-expect=3 -log-level=${CONSUL_LOG} -config-file=/config/server.json -ui-dir=/ui
+
+consul2:
+  container_name: consul2
+  hostname: consul2
+  image: acker/consul
+  net: ${COMPOSE_PROJECT_NAME}
+  restart: always
+  volumes:
+    - "/var/consul:/data"
+  environment:
+    - "constraint:node==ucp2"
+    - "CONSUL_SERVERS=consul0,consul1,consul2"
+  #ports:
+  #  - "8500:8500"
+  command: -server -bootstrap-expect=3 -log-level=${CONSUL_LOG} -config-file=/config/server.json -ui-dir=/ui
+
+vault0:
+  container_name: vault0
+  image: acker/vault
+  net: ${COMPOSE_PROJECT_NAME}
+  restart: always
+  cap_add:
+    - IPC_LOCK
+  environment:
+    - "constraint:node==ucp0"
+    - "CONSUL_SERVERS=consul0,consul1,consul2"
+  
+vault1:
+  container_name: vault1
+  image: acker/vault
+  net: ${COMPOSE_PROJECT_NAME}
+  restart: always
+  cap_add:
+    - IPC_LOCK
+  environment:
+    - "constraint:node==ucp1"
+    - "CONSUL_SERVERS=consul0,consul1,consul2"
+
+nginx:
+  build: ./nginx
+  container_name: nginx-vault
+  net: ${COMPOSE_PROJECT_NAME}
+  restart: always
+  ports:
+    - "8200:80"
+  
+
+
+
+  

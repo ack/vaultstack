@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e
+
+IP=$(hostname -i)
+
+JOIN=""
+IFS=',' read -r -a servers <<< "$CONSUL_SERVERS"
+for e in "${servers[@]}"; do
+  JOIN="$JOIN -join $e"
+done
+
+exec consul agent -client=$IP -bind=$IP $JOIN $@
