@@ -13,8 +13,8 @@ consul0:
   image: acker/consul
   net: ${COMPOSE_PROJECT_NAME}
   restart: always
-  volumes:
-    - "/var/consul:/data"
+  #volumes:
+  #  - "/var/consul:/data"
   environment:
     - "constraint:node==ucp0"
     - "CONSUL_SERVERS=consul0,consul1,consul2"
@@ -28,8 +28,8 @@ consul1:
   image: acker/consul
   net: ${COMPOSE_PROJECT_NAME}
   restart: always
-  volumes:
-    - "/var/consul:/data"
+  #volumes:
+  #  - "/var/consul:/data"
   environment:
     - "constraint:node==ucp1"
     - "CONSUL_SERVERS=consul0,consul1,consul2"
@@ -43,8 +43,8 @@ consul2:
   image: acker/consul
   net: ${COMPOSE_PROJECT_NAME}
   restart: always
-  volumes:
-    - "/var/consul:/data"
+  #volumes:
+  #  - "/var/consul:/data"
   environment:
     - "constraint:node==ucp2"
     - "CONSUL_SERVERS=consul0,consul1,consul2"
